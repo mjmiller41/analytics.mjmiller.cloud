@@ -81,7 +81,7 @@ The audit identified six critical findings:
 ## Phase 2: File Consolidation
 > **Goal:** Merge fragmented single-purpose modules and scripts into cohesive units to eliminate duplicated logic.
 
-- [ ] **Consolidate Localization Download Scripts**
+- [x] **Consolidate Localization Download Scripts**
   - Source files: `scripts/download-country-names.js`, `scripts/download-language-names.js`
   - Destination: `scripts/download-intl-data.js`
   - Action: Merge the two 60-line files into a single parameterized script supporting `--type=countries|languages|all`. Update `package.json` scripts:
@@ -92,7 +92,7 @@ The audit identified six critical findings:
     ```
   - Verification: Run `node scripts/download-intl-data.js --type=all` and verify `public/intl/country/` and `public/intl/language/` files are correctly populated.
 
-- [ ] **Consolidate URL Utility Modules**
+- [x] **Consolidate URL Utility Modules**
   - Source files: `src/lib/url.ts`, `src/lib/api-url.ts`, `src/lib/get-base-url.ts`, `src/lib/return-url.ts`
   - Destination: Cohesive URL module under `src/lib/url.ts` (or barrel export)
   - Action: Group URL parsing, base URL inference, safe return URL validation, and query string builders into a unified module while preserving backward-compatible named exports.
