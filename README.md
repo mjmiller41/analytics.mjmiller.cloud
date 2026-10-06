@@ -29,6 +29,7 @@ A detailed getting started guide can be found at [umami.is/docs](https://umami.i
 
 - A server with Node.js version 18.18+.
 - A PostgreSQL database version v12.14+.
+- pnpm version 12.3.4 (or run via `npx --yes pnpm@12.3.4 <command>`).
 
 ### Get the source code and install packages
 
