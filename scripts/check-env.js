@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import 'dotenv/config';
 
 function checkMissing(vars) {

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import 'dotenv/config';
 import { execSync } from 'node:child_process';
 import { PrismaPg } from '@prisma/adapter-pg';

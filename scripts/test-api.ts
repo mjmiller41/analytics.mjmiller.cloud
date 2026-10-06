@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Orchestrates the API integration suite:
  *

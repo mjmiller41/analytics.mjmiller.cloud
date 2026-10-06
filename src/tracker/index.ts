@@ -413,7 +413,6 @@ type MetricEntry = PerformanceEntry & {
         disabled = !!data.disabled;
         cache = data.cache;
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_e) {
       /* no-op */
     }

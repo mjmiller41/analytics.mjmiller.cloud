@@ -331,7 +331,6 @@ export async function POST(request: Request) {
             ]);
             sessionLinkId = newLinkId;
           } catch (e) {
-            // eslint-disable-next-line no-console
             console.error('Failed to save session link:', e);
           }
         }

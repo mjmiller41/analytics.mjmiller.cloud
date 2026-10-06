@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { type Prisma, PrismaClient } from '../../src/generated/prisma/client.js';
