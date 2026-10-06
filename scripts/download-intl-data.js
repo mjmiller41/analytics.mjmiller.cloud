@@ -53,7 +53,7 @@ const downloadFile = (url, filepath) =>
       });
   });
 
-const downloadDataset = async (type, config) => {
+const downloadDataset = async (_type, config) => {
   const { dest, getUrl } = config;
   fs.mkdirSync(dest, { recursive: true });
 
