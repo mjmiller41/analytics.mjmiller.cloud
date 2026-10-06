@@ -1,7 +1,10 @@
 import { describe, expect, test } from 'vitest';
 import {
   buildPath,
+  getApiUrl,
+  getBaseUrl,
   getQueryString,
+  isSafeReturnUrl,
   isValidUrl,
   safeDecodeURI,
   safeDecodeURIComponent,
@@ -81,3 +84,12 @@ describe('isValidUrl', () => {
     expect(isValidUrl('')).toBe(false);
   });
 });
+
+describe('consolidated url exports', () => {
+  test('exports getApiUrl, getBaseUrl, and isSafeReturnUrl', () => {
+    expect(typeof getApiUrl).toBe('function');
+    expect(typeof getBaseUrl).toBe('function');
+    expect(typeof isSafeReturnUrl).toBe('function');
+  });
+});
+
