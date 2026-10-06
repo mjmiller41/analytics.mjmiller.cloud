@@ -143,7 +143,7 @@ The audit identified six critical findings:
 ## Phase 4: Documentation Alignment
 > **Goal:** Bring `CLAUDE.md`, `README.md`, and `package.json` into strict synchronization with actual project commands and requirements.
 
-- [ ] **Align `CLAUDE.md` Scripts with `package.json`**
+- [x] **Align `CLAUDE.md` Scripts with `package.json`**
   - Target files: `CLAUDE.md`
   - Changes:
     - Replace `pnpm update-db` with `pnpm db:migrate` (runs `prisma migrate deploy`).
@@ -151,12 +151,12 @@ The audit identified six critical findings:
     - Note that user password changes can be performed via the Admin UI or by documenting the proper Prisma command.
   - Verification: Review `CLAUDE.md` against `package.json#scripts`.
 
-- [ ] **Document Toolchain Engine Requirements & Workarounds**
+- [x] **Document Toolchain Engine Requirements & Workarounds**
   - Target files: `README.md`, `CLAUDE.md`
   - Changes: Document that upstream pins `"engines": { "pnpm": "12.3.4" }`. For environments running pnpm 11.x without upgrading globally, document running `npx --yes pnpm@12.3.4 <command>` or updating pnpm via `pnpm i -g pnpm@12.3.4`.
   - Verification: Verify instructions produce reproducible development setup on standard Node 22/24 environments.
 
-- [ ] **Reinforce Fork Discipline Guidance in Documentation**
+- [x] **Reinforce Fork Discipline Guidance in Documentation**
   - Target files: `CLAUDE.md`, `GEMINI.md`
   - Changes: Explicitly caution against automated find-and-replace scripts that rename core upstream identifiers (like `UmamiClient` or `@umami/*`), which cause syntax breakage and severe upstream merge conflicts.
 

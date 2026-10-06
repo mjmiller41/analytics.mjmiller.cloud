@@ -44,7 +44,10 @@ customizing an upstream product**, not building one from scratch. Deploys to a *
 - **Keep changes surgical and merge-friendly.** Every local edit is a future merge conflict when pulling
   upstream. Prefer configuration (env vars) and additive files over modifying upstream source. Touch upstream
   files only when there's no config path to the outcome.
-- **Sync via a second remote.** Add upstream once (`git remote add upstream https://github.com/mjmiller41/analytics.mjmiller.cloud.git`),
+- **Do not run global search-and-replace on upstream identifiers.** Never bulk rename `Umami`, `UmamiClient`,
+  `@umami/*`, or database identifiers. Doing so causes TypeScript syntax errors, breaks package boundaries,
+  and creates severe upstream merge conflicts.
+- **Sync via a second remote.** Add upstream once (`git remote add upstream https://github.com/umami-software/umami.git`),
   then update with `git fetch upstream && git merge upstream/master` (or rebase local work). Don't let the fork drift.
 - **Record why for any upstream-file change** in the commit body, so the next merge knows whether to keep it.
 - Branch per task (`feature/…`, `fix/…`); `main` stays deployable.
@@ -62,7 +65,7 @@ customizing an upstream product**, not building one from scratch. Deploys to a *
 ## Commands
 
 ```bash
-pnpm install
+pnpm install             # Or npx --yes pnpm@12.3.4 install (engine pins pnpm 12.3.4)
 pnpm dev                 # dev server (Turbopack), reads .env via dotenv
 pnpm build               # full pipeline: check-env → build-db → check-db → build-tracker → -recorder → -geo → -app
 pnpm start               # serve production build on :3000 (put a reverse proxy in front)
@@ -71,9 +74,9 @@ pnpm test                # Vitest once   ·  pnpm test:watch  ·  pnpm test:e2e 
 pnpm vitest run <file>   # single unit test file
 pnpm check               # Biome lint+format autofix  ·  pnpm lint  ·  pnpm format
 
-pnpm update-db           # prisma migrate deploy (apply migrations to an existing DB)
-pnpm change-password     # reset a user's password
-pnpm seed-data           # seed sample analytics data
+pnpm db:migrate          # prisma migrate deploy (apply migrations to an existing DB)
+pnpm db:seed             # seed sample analytics data (tsx scripts/seed-data.ts)
+# Password changes: Reset via Settings -> Users in Admin UI or update password hash directly in DB
 ```
 
 First `pnpm build` against an empty DB creates the tables **and a default login `admin` / `umami` — change it
@@ -144,12 +147,21 @@ dropped MySQL, so Postgres is provided by **Neon** (managed, free tier).
   locally and must be set as env vars in the Hostinger app panel. Neon is driveable via the Neon MCP server.
 - **Deploy:** Hostinger builds from the GitHub repo — build `pnpm install && pnpm build`, start `pnpm start`
   (`next start`, honors `PORT`). First build runs migrations and seeds the default `admin`/`umami` login
-  (already done against Neon — **change that password**). Re-apply migrations later with `pnpm update-db`.
+  (already done against Neon — **change that password**). Re-apply migrations later with `pnpm db:migrate`.
 - **Watch:** `next build --turbo` is memory-hungry; if shared hosting OOMs the build, build in CI/Docker and ship
   the output, or use the `Dockerfile`/`docker-compose.yml`. Hostinger runners may need `corepack enable` (or
   `npm i -g pnpm`) since the repo is pnpm-based.
+
+## Toolchain & Engines
+
+- **pnpm 12.3.4:** `package.json` pins `"engines": { "pnpm": "12.3.4" }`. On environments with pnpm 11.x,
+  either run `pnpm i -g pnpm@12.3.4` or execute commands with `npx --yes pnpm@12.3.4 <command>`.
+- **Offline / Local Testing:** Prisma 7 requires `DATABASE_URL` even for generating types (`prisma generate`).
+  When testing locally without an active database, supply a dummy URL:
+  `DATABASE_URL="postgresql://user:pass@localhost:5432/dummy" npx --yes pnpm@12.3.4 test`.
 
 ## Owner
 
 Michael J. Miller — solo full-stack (Node, PHP/Laravel, TypeScript, React), Avon Park FL. Prefers concise,
 direct communication. This runs alongside his other projects (LaserReady, LaserKerf); keep it independent.
+
