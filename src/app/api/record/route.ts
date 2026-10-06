@@ -241,7 +241,6 @@ export async function POST(request: Request) {
         await saveHeatmapEvents(heatmapRows);
       }
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.log('heatmap save failed', serializeError(e));
     }
 

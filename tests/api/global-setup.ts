@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { copyFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { type FullConfig, request } from '@playwright/test';
 import { ApiClient } from './client';

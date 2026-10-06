@@ -32,17 +32,17 @@ The audit identified six critical findings:
 ## Phase 1: Dead Code Removal
 > **Goal:** Eliminate unused files, abandoned test fixtures, dead hooks, and obsolete components to reduce cognitive load and maintenance overhead.
 
-- [ ] **Remove 0-Byte Abandoned File `src/lib/sql.ts`**
+- [x] **Remove 0-Byte Abandoned File `src/lib/sql.ts`**
   - Target files: `src/lib/sql.ts`
   - Action: Delete the empty 0-byte file left over since August 2023.
   - Verification: `git status` shows file deleted; no import references exist.
 
-- [ ] **Remove Root Artifacts `dependabot-review.md` and `package.components.json`**
+- [x] **Remove Root Artifacts `dependabot-review.md` and `package.components.json`**
   - Target files: `dependabot-review.md`, `package.components.json`
   - Action: Delete `dependabot-review.md` (historical one-off audit log from 2026-09-11) and `package.components.json` (orphaned package manifest superseded by `scripts/bump-components.js` writing to `dist/package.json`).
   - Verification: Confirm `pnpm build:components` continues to work cleanly without `package.components.json`.
 
-- [ ] **Remove Dead Custom Hooks**
+- [x] **Remove Dead Custom Hooks**
   - Target files:
     - `src/components/hooks/useDocumentClick.ts`
     - `src/components/hooks/usePageParameters.ts`
@@ -51,7 +51,7 @@ The audit identified six critical findings:
   - Action: Remove the 3 unused hook files and remove their re-exports from `src/components/hooks/index.ts`.
   - Verification: `npx --yes @biomejs/biome@2.5.13 check` passes; no broken imports across the repository.
 
-- [ ] **Remove Dead & Superseded UI Components**
+- [x] **Remove Dead & Superseded UI Components**
   - Target files:
     - `src/components/input/BounceFilter.tsx` (superseded by inline Checkbox in `WebsiteFilterButton.tsx`)
     - `src/components/input/RefreshButton.tsx` (unreferenced in application)
@@ -62,7 +62,7 @@ The audit identified six critical findings:
   - Action: Delete the 5 unused components and remove their references from component index manifests.
   - Verification: `pnpm build` and `npx @biomejs/biome check` verify clean bundle compilation.
 
-- [ ] **Remove Redundant E2E API Tests Duplicating Dedicated API Suite**
+- [x] **Remove Redundant E2E API Tests Duplicating Dedicated API Suite**
   - Target files:
     - `tests/e2e/api-board.spec.ts`
     - `tests/e2e/api-team.spec.ts`
@@ -71,7 +71,7 @@ The audit identified six critical findings:
   - Action: Remove these 4 legacy files from `tests/e2e/`. These tests are fully covered with higher fidelity in `tests/api/*.spec.ts` under the dedicated `playwright.api.config.ts` test configuration.
   - Verification: `npx playwright test -c playwright.config.ts --list` shows only UI-centric tests.
 
-- [ ] **Purge Stale ESLint Disable Directives**
+- [x] **Purge Stale ESLint Disable Directives**
   - Target files: 17 files containing `/* eslint-disable no-console */` and `// eslint-disable-next-line` (e.g. `scripts/check-db.js`, `scripts/check-env.js`, `src/app/api/send/route.ts`, etc.)
   - Action: Remove obsolete ESLint comments across scripts and source files since the project now uses Biome.
   - Verification: `git grep "eslint-disable"` returns 0 results.

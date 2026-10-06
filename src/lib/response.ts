@@ -65,7 +65,6 @@ export function serviceUnavailable(error?: Record<string, any>) {
 
 export function serverError(error?: unknown) {
   if (error && typeof error !== 'string') {
-    // eslint-disable-next-line no-console
     console.log(serializeError(error));
   }
 
