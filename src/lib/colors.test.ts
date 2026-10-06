@@ -40,6 +40,11 @@ describe('rgb2Hex', () => {
     const { r, g, b } = hex2RGB(hex);
     expect(rgb2Hex(r, g, b)).toBe(hex);
   });
+
+  test('pads single-digit channel values with leading zero', () => {
+    expect(rgb2Hex(5, 10, 15, '#')).toBe('#050a0f');
+    expect(rgb2Hex(0, 0, 0)).toBe('000000');
+  });
 });
 
 describe('getColor', () => {

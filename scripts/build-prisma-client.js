@@ -15,4 +15,7 @@ esbuild
       '.prisma/client',
     ], // Optional: Exclude external dependencies from bundling
   })
-  .catch(() => process.exit(1));
+  .catch(err => {
+    console.error('Prisma client build error:', err);
+    process.exit(1);
+  });

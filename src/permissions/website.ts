@@ -1,6 +1,5 @@
 import { hasPermission } from '@/lib/auth';
 import { PERMISSIONS } from '@/lib/constants';
-import { getEntity } from '@/lib/entity';
 import prisma from '@/lib/prisma';
 import type { Auth } from '@/lib/types';
 import { getTeamUser, getWebsite } from '@/queries/prisma';
@@ -21,18 +20,18 @@ export async function canViewWebsite({ user, shareToken }: Auth, websiteId: stri
     return true;
   }
 
-  const entity = await getEntity(websiteId);
+  const website = await getWebsite(websiteId);
 
-  if (!entity || !user) {
+  if (!website || !user) {
     return false;
   }
 
-  if (entity.userId) {
-    return user.id === entity.userId;
+  if (website.userId) {
+    return user.id === website.userId;
   }
 
-  if (entity.teamId) {
-    const teamUser = await getTeamUser(entity.teamId, user.id);
+  if (website.teamId) {
+    const teamUser = await getTeamUser(website.teamId, user.id);
 
     return !!teamUser;
   }
