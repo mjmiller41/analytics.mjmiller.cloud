@@ -90,7 +90,3 @@ export function createKeyValue(key: string, value: any): KeyValueData {
 
   return { key, value: processedValue, dataType };
 }
-
-export function objectToArray(obj: object) {
-  return Object.keys(obj).map(key => obj[key]);
-}

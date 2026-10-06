@@ -5,7 +5,6 @@ import { LoadingPanel } from '@/components/common/LoadingPanel';
 import { useEscapeKey, useJourneyQuery, useMessages } from '@/components/hooks';
 import { File } from '@/components/icons';
 import { Lightning } from '@/components/svg';
-import { objectToArray } from '@/lib/data';
 import { formatLongNumber } from '@/lib/format';
 import styles from './Journey.module.css';
 
@@ -84,7 +83,7 @@ export function Journey({ websiteId, steps, startStep, endStep, view }: JourneyP
       });
 
       columns.push({
-        nodes: objectToArray(nodes).sort(firstBy('total', -1)),
+        nodes: Object.values(nodes).sort(firstBy('total', -1)),
       });
     }
 

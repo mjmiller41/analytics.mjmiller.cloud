@@ -35,7 +35,7 @@ export function hex2RGB(color: string, min: number = 0, max: number = 255) {
 }
 
 export function rgb2Hex(r: number, g: number, b: number, prefix = '') {
-  return `${prefix}${r.toString(16)}${g.toString(16)}${b.toString(16)}`;
+  return `${prefix}${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
 export function getPastel(color: string, factor: number = 0.5, prefix = '') {

@@ -103,22 +103,22 @@ The audit identified six critical findings:
 ## Phase 3: Code Simplification & Defect Resolution
 > **Goal:** Remove redundant abstractions, fix latent runtime bugs, and streamline database queries.
 
-- [ ] **Eliminate Redundant `objectToArray` Helper**
+- [x] **Eliminate Redundant `objectToArray` Helper**
   - Target files: `src/lib/data.ts`, `src/app/(main)/websites/[websiteId]/(reports)/journeys/Journey.tsx`
   - Action: Replace `objectToArray(nodes)` in `Journey.tsx` with native `Object.values(nodes)` and remove `objectToArray` from `src/lib/data.ts`.
   - Verification: `Journey.tsx` renders and types check cleanly with `Object.values`.
 
-- [ ] **Optimize `canViewWebsite` to Eliminate 4-Table N+1 Query**
+- [x] **Optimize `canViewWebsite` to Eliminate 4-Table N+1 Query**
   - Target files: `src/permissions/website.ts`
   - Action: Replace `const entity = await getEntity(websiteId)` with `const website = await getWebsite(websiteId)` in `canViewWebsite`. `getEntity` indiscriminately queries `website`, `link`, `pixel`, and `board` in parallel via `Promise.all` on every website authorization check.
   - Verification: Run `vitest run src/permissions/website.test.ts`.
 
-- [ ] **Guard Redis Calls in `fetchAccount` and `fetchTeam`**
+- [x] **Guard Redis Calls in `fetchAccount` and `fetchTeam`**
   - Target files: `src/lib/load.ts`
   - Action: Add `if (!redis.enabled) return null;` to `fetchAccount` and `fetchTeam` before calling `redis.client.get(...)`. Prevents unexpected connection errors when Redis is disabled (`REDIS_URL` not set).
   - Verification: Run unit tests `src/lib/request.test.ts` and verify no unhandled Redis errors when `REDIS_URL` is omitted.
 
-- [ ] **Fix Hex Color Truncation Bug in `rgb2Hex`**
+- [x] **Fix Hex Color Truncation Bug in `rgb2Hex`**
   - Target files: `src/lib/colors.ts`
   - Action: Update `rgb2Hex` so each component is padded to 2 digits:
     ```ts
@@ -128,12 +128,12 @@ The audit identified six critical findings:
     ```
   - Verification: Run `vitest run src/lib/colors.test.ts` and add test cases verifying values `< 16` output 6-character hex strings.
 
-- [ ] **Expose Error Details in `scripts/build-prisma-client.js`**
+- [x] **Expose Error Details in `scripts/build-prisma-client.js`**
   - Target files: `scripts/build-prisma-client.js`
   - Action: Replace `.catch(() => process.exit(1));` with `.catch(err => { console.error('Prisma client build error:', err); process.exit(1); });`.
   - Verification: Trigger a build failure to confirm readable diagnostic output is preserved.
 
-- [ ] **Correct Package Dependency Groupings in `package.json`**
+- [x] **Correct Package Dependency Groupings in `package.json`**
   - Target files: `package.json`
   - Action: Move `@playwright/test` and `@svgr/cli` from `dependencies` to `devDependencies`. They are only needed during testing and icon generation.
   - Verification: Check that production bundle and container builds don't depend on them at runtime.

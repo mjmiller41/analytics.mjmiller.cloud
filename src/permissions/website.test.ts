@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { getEntity } from '@/lib/entity';
 import { getTeamUser, getWebsite } from '@/queries/prisma';
 import {
   canCreateWebsite,
@@ -15,10 +14,6 @@ import {
 const { websiteFindManyMock, teamUserFindManyMock } = vi.hoisted(() => ({
   websiteFindManyMock: vi.fn(),
   teamUserFindManyMock: vi.fn(),
-}));
-
-vi.mock('@/lib/entity', () => ({
-  getEntity: vi.fn(),
 }));
 
 vi.mock('@/queries/prisma', () => ({
@@ -55,7 +50,6 @@ const normalUser = { id: 'user-1', username: 'user', role: 'user', isAdmin: fals
 const viewOnlyUser = { id: 'user-2', username: 'viewer', role: 'view-only', isAdmin: false };
 
 beforeEach(() => {
-  vi.mocked(getEntity).mockReset();
   vi.mocked(getWebsite).mockReset();
   vi.mocked(getTeamUser).mockReset();
   websiteFindManyMock.mockReset();
@@ -65,7 +59,7 @@ beforeEach(() => {
 describe('canViewWebsite', () => {
   test('allows admins without any lookup', async () => {
     await expect(canViewWebsite({ user: adminUser }, 'website-1')).resolves.toBe(true);
-    expect(getEntity).not.toHaveBeenCalled();
+    expect(getWebsite).not.toHaveBeenCalled();
   });
 
   test('allows a matching single share token id', async () => {
@@ -86,40 +80,40 @@ describe('canViewWebsite', () => {
     ).resolves.toBe(true);
   });
 
-  test('denies when entity is missing', async () => {
-    vi.mocked(getEntity).mockResolvedValue(null as any);
+  test('denies when website is missing', async () => {
+    vi.mocked(getWebsite).mockResolvedValue(null as any);
     await expect(canViewWebsite({ user: normalUser }, 'website-1')).resolves.toBe(false);
   });
 
   test('denies when there is no user and no matching share token', async () => {
-    vi.mocked(getEntity).mockResolvedValue({ userId: 'user-1' } as any);
+    vi.mocked(getWebsite).mockResolvedValue({ userId: 'user-1' } as any);
     await expect(canViewWebsite({}, 'website-1')).resolves.toBe(false);
   });
 
   test('allows the owner of a user-owned website', async () => {
-    vi.mocked(getEntity).mockResolvedValue({ userId: 'user-1' } as any);
+    vi.mocked(getWebsite).mockResolvedValue({ userId: 'user-1' } as any);
     await expect(canViewWebsite({ user: normalUser }, 'website-1')).resolves.toBe(true);
   });
 
   test('denies a non-owner of a user-owned website', async () => {
-    vi.mocked(getEntity).mockResolvedValue({ userId: 'other-user' } as any);
+    vi.mocked(getWebsite).mockResolvedValue({ userId: 'other-user' } as any);
     await expect(canViewWebsite({ user: normalUser }, 'website-1')).resolves.toBe(false);
   });
 
   test('allows a member of the owning team', async () => {
-    vi.mocked(getEntity).mockResolvedValue({ teamId: 'team-1' } as any);
+    vi.mocked(getWebsite).mockResolvedValue({ teamId: 'team-1' } as any);
     vi.mocked(getTeamUser).mockResolvedValue({ role: 'team-member' } as any);
     await expect(canViewWebsite({ user: normalUser }, 'website-1')).resolves.toBe(true);
   });
 
   test('denies a non-member of the owning team', async () => {
-    vi.mocked(getEntity).mockResolvedValue({ teamId: 'team-1' } as any);
+    vi.mocked(getWebsite).mockResolvedValue({ teamId: 'team-1' } as any);
     vi.mocked(getTeamUser).mockResolvedValue(null as any);
     await expect(canViewWebsite({ user: normalUser }, 'website-1')).resolves.toBe(false);
   });
 
-  test('denies when entity has neither userId nor teamId', async () => {
-    vi.mocked(getEntity).mockResolvedValue({} as any);
+  test('denies when website has neither userId nor teamId', async () => {
+    vi.mocked(getWebsite).mockResolvedValue({} as any);
     await expect(canViewWebsite({ user: normalUser }, 'website-1')).resolves.toBe(false);
   });
 });
@@ -161,9 +155,7 @@ describe('canViewBatchWebsites', () => {
   });
 
   test('excludes team websites when the user is not a team member', async () => {
-    websiteFindManyMock.mockResolvedValue([
-      { id: 'team', userId: null, teamId: 'team-1' },
-    ] as any);
+    websiteFindManyMock.mockResolvedValue([{ id: 'team', userId: null, teamId: 'team-1' }] as any);
     teamUserFindManyMock.mockResolvedValue([] as any);
 
     await expect(canViewBatchWebsites({ user: normalUser }, ['team'])).resolves.toEqual([]);
