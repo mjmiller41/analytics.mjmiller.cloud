@@ -9,9 +9,20 @@ user/team permission checks as the web app.
 
 ## Tools
 
+### Websites & Configuration
+
+| Tool             | Purpose                                                                               |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| `list_websites`  | Find the websites you can access (call first to get a `websiteId`).                   |
+| `get_website`    | Detailed website metadata and embed tracking script snippet.                         |
+| `create_website` | Register a new website, returning its ID and ready-to-use `<script>` tracking tag.     |
+| `update_website` | Update display name or domain of an existing website.                                 |
+| `delete_website` | Permanently delete a website and historical data. **Requires `confirm: true`** flag.   |
+
+### Analytics & Reporting
+
 | Tool                  | Purpose                                                                 |
 | --------------------- | ----------------------------------------------------------------------- |
-| `list_websites`       | Find the websites you can access (call first to get a `websiteId`).     |
 | `get_website_daterange` | Earliest and latest dates with recorded data.                         |
 | `get_website_stats`   | Pageviews, visitors, visits, bounce rate, duration + previous period.   |
 | `get_website_traffic` | Pageview/visit time series by minute, hour, day, month or year.         |
@@ -35,7 +46,7 @@ user/team permission checks as the web app.
 | `get_revenue`         | Revenue totals, series and breakdowns.                                  |
 | `get_performance`     | Core Web Vitals (LCP, INP, CLS, FCP, TTFB) percentiles, trend, breakdown. |
 
-All tools are read-only. Dates are ISO 8601; results are paginated with a hard cap on page size.
+Dates are ISO 8601; results are paginated with a hard cap on page size. Destructive tools (`delete_website`) require an explicit confirmation flag (`confirm: true`).
 
 ## Remote: Umami Cloud
 

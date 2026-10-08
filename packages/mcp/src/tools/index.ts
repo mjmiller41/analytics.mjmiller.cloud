@@ -16,11 +16,12 @@ import { getSessionStats } from './session-stats';
 import { getSessions } from './sessions';
 import { getWebsiteStats } from './stats';
 import { getWebsiteTraffic } from './traffic';
-import { listWebsites } from './websites';
+import { createWebsite, deleteWebsite, getWebsite, listWebsites, updateWebsite } from './websites';
 
-/** Core read-only analytics tools. */
+/** Core analytics tools. */
 export const coreTools: AnyToolDefinition[] = [
   listWebsites,
+  getWebsite,
   getWebsiteDateRange,
   getWebsiteStats,
   getWebsiteTraffic,
@@ -35,6 +36,13 @@ export const coreTools: AnyToolDefinition[] = [
   getSession,
   getAnnotations,
   listSegments,
+];
+
+/** Website management tools. */
+export const websiteManagementTools: AnyToolDefinition[] = [
+  createWebsite,
+  updateWebsite,
+  deleteWebsite,
 ];
 
 /** Higher-level report tools. */
@@ -49,9 +57,15 @@ export const reportTools: AnyToolDefinition[] = [
   getPerformance,
 ];
 
-export const allTools: AnyToolDefinition[] = [...coreTools, ...reportTools];
+export const allTools: AnyToolDefinition[] = [
+  ...coreTools,
+  ...websiteManagementTools,
+  ...reportTools,
+];
 
 export {
+  createWebsite,
+  deleteWebsite,
   getAnnotations,
   getEventProperties,
   getEventSeries,
@@ -64,6 +78,7 @@ export {
   getSession,
   getSessionStats,
   getSessions,
+  getWebsite,
   getWebsiteDateRange,
   getWebsiteMetrics,
   getWebsiteStats,
@@ -75,4 +90,5 @@ export {
   runFunnel,
   runJourney,
   runRetention,
+  updateWebsite,
 };

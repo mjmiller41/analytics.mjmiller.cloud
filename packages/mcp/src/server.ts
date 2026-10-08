@@ -5,17 +5,18 @@ import { type AnyToolDefinition, registerTool, type ToolContext } from './lib/to
 import { allTools } from './tools';
 
 export const SERVER_NAME = 'umami';
-export const SERVER_VERSION = '0.1.0';
+export const SERVER_VERSION = '0.2.0';
 
-export const SERVER_INSTRUCTIONS = `Umami is a privacy-focused web analytics platform. These tools answer questions about website traffic, visitors, pages, referrers, events, sessions and conversion reports.
+export const SERVER_INSTRUCTIONS = `Umami is a privacy-focused web analytics platform. These tools answer questions about website traffic, visitors, pages, referrers, events, sessions and conversion reports, as well as managing tracked websites.
 
 Workflow:
-1. Call list_websites to find the websiteId for the site the user is asking about (match by name or domain).
-2. If unsure what dates have data, call get_website_daterange first.
-3. Use get_website_stats for totals, get_website_traffic for trends over time, get_website_metrics for rankings (top pages, referrers, countries, browsers, campaigns, events), get_realtime for current visitors, get_event_stats / get_event_series for custom event totals and trends, get_event_properties to explore the custom data sent with events, get_session_stats for session counts, get_events / get_sessions / get_session to inspect individual activity, get_annotations to explain spikes with the team's dated notes, get_performance for Core Web Vitals, and run_funnel / run_journey / run_retention / run_attribution / get_revenue / get_goals for reports.
-4. Saved definitions: list_funnels finds funnelIds for run_funnel, get_goals reports saved goals, and list_segments finds segment/cohort IDs to pass in filters.
+1. Call list_websites to find the websiteId for the site the user is asking about (match by name or domain), or get_website to retrieve its details and embed tracking snippet.
+2. To add or modify websites, call create_website or update_website. To permanently remove a website, call delete_website with confirm: true.
+3. If unsure what dates have data, call get_website_daterange first.
+4. Use get_website_stats for totals, get_website_traffic for trends over time, get_website_metrics for rankings (top pages, referrers, countries, browsers, campaigns, events), get_realtime for current visitors, get_event_stats / get_event_series for custom event totals and trends, get_event_properties to explore the custom data sent with events, get_session_stats for session counts, get_events / get_sessions / get_session to inspect individual activity, get_annotations to explain spikes with the team's dated notes, get_performance for Core Web Vitals, and run_funnel / run_journey / run_retention / run_attribution / get_revenue / get_goals for reports.
+5. Saved definitions: list_funnels finds funnelIds for run_funnel, get_goals reports saved goals, and list_segments finds segment/cohort IDs to pass in filters.
 
-Dates are ISO 8601 strings; endAt defaults to now. Results are paginated where noted — request another page rather than a huge pageSize. All tools are read-only.`;
+Dates are ISO 8601 strings; endAt defaults to now. Results are paginated where noted — request another page rather than a huge pageSize. Destructive operations (delete_website) require confirm: true.`;
 
 export interface CreateUmamiMcpServerOptions {
   /** API client carrying the caller's credentials. The MCP server never touches storage directly. */
@@ -24,7 +25,7 @@ export interface CreateUmamiMcpServerOptions {
   logger?: McpLogger;
   /** Identity for log correlation (never used for authorization). */
   identity?: ToolContext['identity'];
-  /** Override the registered tool set (defaults to all read-only tools). */
+  /** Override the registered tool set (defaults to all tools). */
   tools?: AnyToolDefinition[];
 }
 

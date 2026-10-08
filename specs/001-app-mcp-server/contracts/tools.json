@@ -1,0 +1,152 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "UmamiAgentMcpTools",
+  "description": "JSON Schemas for Agent MCP Server Tools",
+  "tools": [
+    {
+      "name": "list_websites",
+      "description": "Lists websites the authenticated agent can access. Returns website ID, name, and domain.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "search": { "type": "string", "description": "Filter websites by name or domain." },
+          "page": { "type": "integer", "minimum": 1, "description": "Page number, starting at 1." },
+          "pageSize": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Results per page (default 20, max 100)."
+          }
+        }
+      }
+    },
+    {
+      "name": "get_website",
+      "description": "Retrieves metadata and tracking embed code for a specific website.",
+      "parameters": {
+        "type": "object",
+        "required": ["websiteId"],
+        "properties": {
+          "websiteId": { "type": "string", "description": "Unique identifier of the website." }
+        }
+      }
+    },
+    {
+      "name": "create_website",
+      "description": "Registers a new website in the analytics system and returns its ID and embed tracking snippet.",
+      "parameters": {
+        "type": "object",
+        "required": ["name", "domain"],
+        "properties": {
+          "name": { "type": "string", "description": "Display name of the website." },
+          "domain": {
+            "type": "string",
+            "description": "Domain name or hostname (e.g. example.com)."
+          },
+          "teamId": {
+            "type": "string",
+            "description": "Optional team ID to assign the website to."
+          }
+        }
+      }
+    },
+    {
+      "name": "update_website",
+      "description": "Updates name or domain of an existing website.",
+      "parameters": {
+        "type": "object",
+        "required": ["websiteId"],
+        "properties": {
+          "websiteId": { "type": "string", "description": "Unique identifier of the website." },
+          "name": { "type": "string", "description": "New display name." },
+          "domain": { "type": "string", "description": "New domain name." }
+        }
+      }
+    },
+    {
+      "name": "delete_website",
+      "description": "Deletes a website and its analytics data. Requires explicit confirm=true flag.",
+      "parameters": {
+        "type": "object",
+        "required": ["websiteId"],
+        "properties": {
+          "websiteId": {
+            "type": "string",
+            "description": "Unique identifier of the website to delete."
+          },
+          "confirm": {
+            "type": "boolean",
+            "description": "Set to true to execute deletion. When false or omitted, returns a confirmation prompt without deleting."
+          }
+        }
+      }
+    },
+    {
+      "name": "get_website_stats",
+      "description": "Aggregated website traffic metrics: pageviews, visitors, visits, bounce rate, and duration.",
+      "parameters": {
+        "type": "object",
+        "required": ["websiteId", "startAt"],
+        "properties": {
+          "websiteId": { "type": "string", "description": "Unique identifier of the website." },
+          "startAt": { "type": "string", "description": "Start date in ISO 8601 format." },
+          "endAt": {
+            "type": "string",
+            "description": "End date in ISO 8601 format (defaults to now)."
+          },
+          "compare": { "type": "boolean", "description": "Include comparisons to previous period." }
+        }
+      }
+    },
+    {
+      "name": "get_website_metrics",
+      "description": "Ranked breakdowns for a website (pages, referrers, browsers, devices, countries, UTM).",
+      "parameters": {
+        "type": "object",
+        "required": ["websiteId", "startAt", "type"],
+        "properties": {
+          "websiteId": { "type": "string", "description": "Unique identifier of the website." },
+          "startAt": { "type": "string", "description": "Start date in ISO 8601 format." },
+          "endAt": { "type": "string", "description": "End date in ISO 8601 format." },
+          "type": {
+            "type": "string",
+            "enum": [
+              "path",
+              "referrer",
+              "browser",
+              "os",
+              "device",
+              "country",
+              "region",
+              "city",
+              "language",
+              "title",
+              "query",
+              "channel",
+              "tag",
+              "host"
+            ],
+            "description": "Metric breakdown dimension."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500,
+            "description": "Max entries to return (default 50)."
+          }
+        }
+      }
+    },
+    {
+      "name": "get_realtime",
+      "description": "Returns current active visitors and paths viewed in the last 5 minutes.",
+      "parameters": {
+        "type": "object",
+        "required": ["websiteId"],
+        "properties": {
+          "websiteId": { "type": "string", "description": "Unique identifier of the website." }
+        }
+      }
+    }
+  ]
+}
