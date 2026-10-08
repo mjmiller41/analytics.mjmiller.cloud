@@ -53,10 +53,23 @@ async function connect(harness: ReturnType<typeof createHarness>) {
 describe('createUmamiMcpServer', () => {
   let harness: ReturnType<typeof createHarness>;
 
-  const routes: Handler = url => {
+  const routes: Handler = (url, init) => {
     const path = url.pathname;
 
     if (path === '/api/websites') {
+      if (init?.method === 'POST') {
+        const payload = JSON.parse(init.body as string);
+        return {
+          body: {
+            id: 'new-website-id',
+            name: payload.name,
+            domain: payload.domain,
+            teamId: payload.teamId ?? null,
+            createdAt: '2026-10-08T12:00:00Z',
+          },
+        };
+      }
+
       return {
         body: {
           data: [
@@ -65,6 +78,37 @@ describe('createUmamiMcpServer', () => {
           count: 1,
           page: 1,
           pageSize: 20,
+        },
+      };
+    }
+
+    if (path === `/api/websites/${WEBSITE_ID}`) {
+      if (init?.method === 'DELETE') {
+        return { body: { ok: true } };
+      }
+      if (init?.method === 'POST') {
+        const payload = JSON.parse(init.body as string);
+        return {
+          body: {
+            id: WEBSITE_ID,
+            name: payload.name ?? 'Umami',
+            domain: payload.domain ?? 'umami.is',
+            teamId: null,
+            updatedAt: '2026-10-08T13:00:00Z',
+          },
+        };
+      }
+
+      return {
+        body: {
+          id: WEBSITE_ID,
+          name: 'Umami',
+          domain: 'umami.is',
+          teamId: null,
+          shareId: null,
+          resetAt: null,
+          createdAt: '2026-10-01T00:00:00Z',
+          updatedAt: '2026-10-01T00:00:00Z',
         },
       };
     }
@@ -423,13 +467,17 @@ describe('createUmamiMcpServer', () => {
     await harness.server.close();
   });
 
-  test('registers the expected read-only tools', async () => {
+  test('registers the expected tools', async () => {
     const { tools } = await harness.client.listTools();
     const names = tools.map(tool => tool.name).sort();
 
     expect(names).toEqual(
       [
         'list_websites',
+        'get_website',
+        'create_website',
+        'update_website',
+        'delete_website',
         'get_website_daterange',
         'get_website_stats',
         'get_website_traffic',
@@ -456,8 +504,16 @@ describe('createUmamiMcpServer', () => {
     );
 
     for (const tool of tools) {
-      expect(tool.annotations?.readOnlyHint).toBe(true);
-      expect(tool.annotations?.destructiveHint).toBe(false);
+      if (tool.name === 'delete_website') {
+        expect(tool.annotations?.readOnlyHint).toBe(false);
+        expect(tool.annotations?.destructiveHint).toBe(true);
+      } else if (tool.name === 'create_website' || tool.name === 'update_website') {
+        expect(tool.annotations?.readOnlyHint).toBe(false);
+        expect(tool.annotations?.destructiveHint).toBe(false);
+      } else {
+        expect(tool.annotations?.readOnlyHint).toBe(true);
+        expect(tool.annotations?.destructiveHint).toBe(false);
+      }
       expect(tool.description?.length ?? 0).toBeGreaterThan(40);
     }
   });
@@ -476,6 +532,82 @@ describe('createUmamiMcpServer', () => {
     expect(
       (harness.calls[0].init?.headers as Record<string, string> | undefined)?.authorization,
     ).toBe('Bearer secret-token');
+  });
+
+  test('get_website returns site metadata and formatted tracking snippet', async () => {
+    const result = await harness.client.callTool({
+      name: 'get_website',
+      arguments: { websiteId: WEBSITE_ID },
+    });
+
+    expect(result.isError).toBeFalsy();
+    expect(result.structuredContent).toMatchObject({
+      website: { id: WEBSITE_ID, name: 'Umami', domain: 'umami.is' },
+      tracking: {
+        websiteId: WEBSITE_ID,
+        scriptUrl: 'https://example.com/script.js',
+        htmlTag: `<script defer src="https://example.com/script.js" data-website-id="${WEBSITE_ID}"></script>`,
+      },
+    });
+  });
+
+  test('create_website creates site and returns embed tracking code', async () => {
+    const result = await harness.client.callTool({
+      name: 'create_website',
+      arguments: { name: 'My New Site', domain: 'newsite.cloud' },
+    });
+
+    expect(result.isError).toBeFalsy();
+    expect(result.structuredContent).toMatchObject({
+      website: { id: 'new-website-id', name: 'My New Site', domain: 'newsite.cloud' },
+      tracking: {
+        websiteId: 'new-website-id',
+        scriptUrl: 'https://example.com/script.js',
+        htmlTag:
+          '<script defer src="https://example.com/script.js" data-website-id="new-website-id"></script>',
+      },
+    });
+  });
+
+  test('update_website updates site details', async () => {
+    const result = await harness.client.callTool({
+      name: 'update_website',
+      arguments: { websiteId: WEBSITE_ID, name: 'Updated Umami' },
+    });
+
+    expect(result.isError).toBeFalsy();
+    expect(result.structuredContent).toMatchObject({
+      website: { id: WEBSITE_ID, name: 'Updated Umami' },
+      tracking: { websiteId: WEBSITE_ID },
+    });
+  });
+
+  test('delete_website aborts with warning when confirm is not true', async () => {
+    const result = await harness.client.callTool({
+      name: 'delete_website',
+      arguments: { websiteId: WEBSITE_ID },
+    });
+
+    expect(result.isError).toBeFalsy();
+    expect(result.structuredContent).toMatchObject({
+      status: 'confirmation_required',
+      websiteId: WEBSITE_ID,
+    });
+    expect(harness.calls.some(call => call.init?.method === 'DELETE')).toBe(false);
+  });
+
+  test('delete_website executes deletion when confirm is true', async () => {
+    const result = await harness.client.callTool({
+      name: 'delete_website',
+      arguments: { websiteId: WEBSITE_ID, confirm: true },
+    });
+
+    expect(result.isError).toBeFalsy();
+    expect(result.structuredContent).toMatchObject({
+      status: 'deleted',
+      websiteId: WEBSITE_ID,
+    });
+    expect(harness.calls.some(call => call.init?.method === 'DELETE')).toBe(true);
   });
 
   test('get_website_stats converts ISO dates to timestamps and summarizes both periods', async () => {

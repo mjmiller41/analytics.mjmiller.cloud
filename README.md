@@ -119,6 +119,78 @@ docker compose up --force-recreate -d
 
 ---
 
+## 🤖 AI Agent & MCP Integration
+
+This application includes a built-in [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that allows AI coding assistants and agents (Claude Desktop, Cursor, Antigravity, OpenDevin, and custom LLM workflows) to interact with your analytics data and manage tracked properties.
+
+### Setup & Prerequisites
+
+1. **Enable the MCP endpoint**: Set `MCP_ENABLED=1` in your environment variables (`.env`).
+2. **Generate an API key**: Log in to the dashboard, navigate to **Settings → API keys**, and generate a key (`umami_...`).
+
+### Connection Methods
+
+#### 1. Remote Streamable HTTP (SSE)
+For remote or cloud-hosted agents, connect directly to the Streamable HTTP endpoint:
+
+- **Endpoint URL**: `https://analytics.mjmiller.cloud/mcp` (or your custom domain)
+- **Headers**:
+  ```http
+  Authorization: Bearer umami_<your-api-key>
+  ```
+
+#### 2. Local Stdio Runner
+For local desktop assistants (Claude Desktop, Cursor, Antigravity CLI), configure the server via stdio:
+
+##### Claude Desktop (`claude_desktop_config.json`)
+```json
+{
+  "mcpServers": {
+    "umami-analytics": {
+      "command": "node",
+      "args": ["/path/to/analytics.mjmiller.cloud/packages/mcp/dist/cli.js"],
+      "env": {
+        "UMAMI_URL": "https://analytics.mjmiller.cloud",
+        "UMAMI_API_TOKEN": "umami_<your-api-key>"
+      }
+    }
+  }
+}
+```
+
+##### Cursor / Antigravity (`.cursor/mcp.json`)
+```json
+{
+  "mcpServers": {
+    "umami-analytics": {
+      "command": "node",
+      "args": ["packages/mcp/bin/umami-mcp.js"],
+      "env": {
+        "UMAMI_URL": "https://analytics.mjmiller.cloud",
+        "UMAMI_API_TOKEN": "umami_<your-api-key>"
+      }
+    }
+  }
+}
+```
+
+### Available Tools
+
+- **Websites & Configuration**:
+  - `list_websites`: Discover accessible websites (returns ID, name, domain).
+  - `get_website`: Inspect detailed website metadata and retrieve ready-to-use `<script defer src="..." data-website-id="..."></script>` embed snippet.
+  - `create_website`: Provision a new tracked domain and immediately return its tracking tag.
+  - `update_website`: Update display name or domain of an existing website.
+  - `delete_website`: Permanently delete a website and historical analytics data (**requires `confirm: true`** safety guardrail).
+- **Traffic & Analytics**:
+  - `get_website_stats`: Totals for pageviews, unique visitors, visits, bounce rates, and visit duration.
+  - `get_website_metrics`: Ranked breakdowns (top pages, referrers, browsers, devices, countries, UTM channels).
+  - `get_realtime`: Active visitors and paths viewed in the last 5 minutes.
+  - `get_website_traffic`: Time series metrics by minute, hour, day, month, or year.
+  - `get_events`, `get_sessions`, `run_funnel`, `get_revenue`, `get_performance`: Deep custom events, session journeys, and conversion funnels.
+
+---
+
 ## 🛟 Support
 
 <p align="center">
