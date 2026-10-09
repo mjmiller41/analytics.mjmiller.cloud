@@ -24,6 +24,7 @@ const trackerScriptName = process.env.TRACKER_SCRIPT_NAME || '';
 const trackerScriptURL = process.env.TRACKER_SCRIPT_URL || '';
 const selfTrack = process.env.UMAMI_SELF_TRACK || '';
 const selfRecord = process.env.UMAMI_SELF_RECORD || '';
+const mcpEnabled = process.env.MCP_ENABLED || '1';
 
 function isRelativeUrl(url: string) {
   return Boolean(url && !/^https?:\/\//i.test(url));
@@ -221,6 +222,7 @@ export default withNextIntl({
     defaultLocale,
     selfTrack,
     selfRecord,
+    MCP_ENABLED: mcpEnabled,
   },
   basePath,
   output: isVercel ? undefined : 'standalone',
