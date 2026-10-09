@@ -50,10 +50,10 @@ importers:
         specifier: ^5.102.8
         version: 5.102.8(react@19.3.0)
       '@umami/api-client':
-        specifier: workspace:*
+        specifier: file:packages/api-client
         version: link:packages/api-client
       '@umami/mcp':
-        specifier: workspace:*
+        specifier: file:packages/mcp
         version: link:packages/mcp
       '@umami/react-zen':
         specifier: ^0.254.0
